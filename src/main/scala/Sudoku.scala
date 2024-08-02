@@ -33,6 +33,48 @@ object Sudoku {
       )
   }
 
+  def solve(grid: SudokuGrid): SudokuGrid = {
+    def solveSudoku(grid: SudokuGrid): Boolean = {
+      def findEmptyLocation: Option[(Int, Int)] = {
+        (for {
+          rowIdx <- 0 until 9
+          colIdx <- 0 until 9
+          if grid(rowIdx)(colIdx) == 0
+        } yield (rowIdx, colIdx)).headOption
+      }
+
+      def isValidMove(rowIdx: Int, colIdx: Int, num: Int): Boolean = {
+        !grid(rowIdx).contains(num) &&
+          !grid.map(_(colIdx)).contains(num) &&
+          !grid.slice(rowIdx / 3 * 3, rowIdx / 3 * 3 + 3)
+            .exists(_.slice(colIdx / 3 * 3, colIdx / 3 * 3 + 3).contains(num))
+      }
+
+      def solve: Boolean = {
+        findEmptyLocation match {
+          case None => true // Solved
+          case Some((rowIdx, colIdx)) =>
+            (1 to 9).exists { num =>
+              if (isValidMove(rowIdx, colIdx, num)) {
+                grid(rowIdx)(colIdx) = num
+                if (solve) true
+                else {
+                  grid(rowIdx)(colIdx) = 0
+                  false
+                }
+              } else false
+            }
+        }
+      }
+
+      solve
+    }
+
+    val newGrid = grid.map(_.clone)
+    solveSudoku(newGrid)
+    newGrid
+  }
+
   def main(args: Array[String]): Unit = {
     val validSudoku: SudokuGrid = Array(
       Array(4, 3, 5, 2, 6, 9, 7, 8, 1),
@@ -60,5 +102,26 @@ object Sudoku {
 
     println(isSudokuValid(validSudoku)) // Should print true
     println(isSudokuValid(invalidSudoku)) // Should print false
+
+    val unsolvedSudoku: SudokuGrid = Array(
+      Array(4, 3, 5, 2, 6, 9, 7, 8, 1),
+      Array(6, 8, 2, 5, 7, 1, 4, 9, 3),
+      Array(1, 9, 0, 8, 3, 4, 5, 6, 2),
+      Array(8, 2, 6, 1, 9, 5, 3, 4, 7),
+      Array(3, 7, 4, 6, 8, 2, 9, 1, 5),
+      Array(9, 5, 1, 7, 4, 3, 6, 0, 8),
+      Array(5, 1, 9, 3, 2, 6, 8, 7, 4),
+      Array(2, 0, 8, 9, 5, 7, 1, 3, 0),
+      Array(7, 6, 3, 4, 1, 8, 2, 5, 0)
+    )
+
+    val solvedSudoku = solve(unsolvedSudoku)
+
+    if (!isSudokuValid(solvedSudoku)) {
+      println("Invalid Sudoku")
+      System.exit(1)
+    }
+    println("Solved Sudoku:")
+    solvedSudoku.foreach(row => println(row.mkString(" ")))
   }
 }
