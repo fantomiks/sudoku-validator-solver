@@ -1,4 +1,4 @@
-import Sudoku.{SudokuGrid, isBlockValid, isColValid, isRowValid, isSudokuValid}
+import Sudoku.{SudokuGrid, isBlockValid, isColValid, isRowValid, isSudokuValid, solve}
 import org.scalatest.funsuite.AnyFunSuite
 
 class SudokuSpec extends AnyFunSuite {
@@ -103,5 +103,41 @@ class SudokuSpec extends AnyFunSuite {
       Array(7, 6, 3, 4, 1, 8, 2, 5, 9)
     )
     assert(!isBlockValid(grid, 0, 1))
+  }
+
+  test("Sudoku is solved") {
+    val unsolvedSudoku: SudokuGrid = Array(
+      Array(4, 3, 5, 2, 6, 9, 7, 8, 1),
+      Array(6, 8, 2, 5, 7, 1, 4, 9, 3),
+      Array(1, 9, 0, 8, 3, 4, 5, 6, 2),
+      Array(8, 2, 6, 1, 9, 5, 3, 4, 7),
+      Array(3, 7, 4, 6, 8, 2, 9, 1, 5),
+      Array(9, 5, 1, 7, 4, 3, 6, 0, 8),
+      Array(5, 1, 9, 3, 2, 6, 8, 7, 4),
+      Array(2, 0, 8, 9, 5, 7, 1, 3, 0),
+      Array(7, 6, 3, 4, 1, 8, 2, 5, 0)
+    )
+
+    val solvedSudoku = solve(unsolvedSudoku)
+
+    assert(isSudokuValid(solvedSudoku))
+  }
+
+  test("Sudoku is not solved") {
+    val unsolvedSudoku: SudokuGrid = Array(
+      Array(4, 1, 5, 2, 6, 9, 7, 8, 1),
+      Array(6, 8, 2, 5, 7, 1, 4, 9, 3),
+      Array(1, 9, 0, 8, 3, 4, 5, 6, 2),
+      Array(8, 2, 6, 1, 9, 5, 3, 4, 7),
+      Array(3, 7, 4, 6, 8, 2, 9, 1, 5),
+      Array(9, 5, 1, 7, 4, 3, 6, 2, 8),
+      Array(5, 1, 9, 3, 2, 6, 8, 7, 4),
+      Array(2, 4, 8, 9, 5, 7, 1, 3, 0),
+      Array(7, 6, 3, 4, 1, 8, 2, 5, 0)
+    )
+
+    val solvedSudoku = solve(unsolvedSudoku)
+
+    assert(!isSudokuValid(solvedSudoku))
   }
 }
